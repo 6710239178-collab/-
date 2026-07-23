@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ม้านั่งสำรอง — เรื่องราวลูกหนัง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch-dark:#0B2E23;
+    --paper:#F3EFE4;
+    --ink:#171A16;
+    --ink-dim:#5B5A50;
+    --amber:#C7791F;
+    --line:#DAD3C0;
+    --card-bg:#FFFDF7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Sans Thai',sans-serif;-webkit-font-smoothing:antialiased;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 90px;}
+
+  /* Top masthead */
+  .masthead{
+    background:var(--pitch-dark);color:var(--paper);
+    padding:22px 24px;
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:44px;
+  }
+  .masthead-inner{max-width:1180px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .brand{
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:22px;letter-spacing:0.02em;
+    display:flex;align-items:center;gap:10px;
+  }
+  .brand .badge{
+    width:30px;height:30px;border-radius:50%;background:var(--amber);
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1a1a1a;
+  }
+  .masthead-tag{font-size:12.5px;color:#C9C2AE;font-family:'Oswald',sans-serif;letter-spacing:0.06em;}
+
+  .homehead{margin-bottom:36px;}
+  .homehead .eyebrow{
+    font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;
+    font-size:12px;color:var(--amber);margin-bottom:8px;
+  }
+  .homehead h1{
+    font-family:'Noto Serif Thai',serif;font-weight:700;font-size:clamp(28px,4.6vw,44px);
+    line-height:1.2;margin:0 0 10px;
+  }
+  .homehead p{color:var(--ink-dim);font-size:15px;max-width:600px;line-height:1.7;margin:0;}
+
+  /* Feed grid */
+  .feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px;}
+
+  .story{
+    background:var(--card-bg);border:1px solid var(--line);border-radius:4px;overflow:hidden;
+    cursor:pointer;transition:box-shadow 0.18s ease, transform 0.18s ease;
+    display:flex;flex-direction:column;
+  }
+  .story:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(20,20,10,0.1);}
+  .story:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  .story-hero{
+    aspect-ratio:16/10;position:relative;overflow:hidden;
+    display:flex;align-items:flex-end;
+    background:linear-gradient(135deg,var(--hc1,#274B3B),var(--hc2,#0B2E23));
+  }
+  .story-hero::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.55) 100%);
+  }
+  .hero-mono{
+    position:relative;z-index:1;color:rgba(255,255,255,0.92);
+    font-family:'Oswald',sans-serif;font-weight:700;
+    padding:16px 18px;font-size:13px;letter-spacing:0.05em;text-transform:uppercase;
+  }
+  .hero-num{
+    position:absolute;top:14px;right:16px;z-index:1;
+    font-family:'Oswald',sans-serif;font-weight:700;font-size:44px;color:rgba(255,255,255,0.18);
+  }
+
+  .story-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .story-cat{
+    font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.1em;
+    text-transform:uppercase;color:var(--amber);
+  }
+  .story h2{
+    font-family:'Noto Sans Thai',sans-serif;font-weight:700;font-size:17.5px;line-height:1.4;margin:0;
+  }
+  .story .dek{font-size:13px;color:var(--ink-dim);line-height:1.65;margin:0;}
+  .story-meta{
+    margin-top:auto;padding-top:12px;border-top:1px solid var(--line);
+    font-size:11.5px;color:var(--ink-dim);font-family:'Oswald',sans-serif;letter-spacing:0.03em;
+    display:flex;justify-content:space-between;
+  }
+
+  /* Reader overlay */
+  .reader{
+    position:fixed;inset:0;background:var(--paper);
+    transform:translateY(100%);transition:transform 0.34s cubic-bezier(.2,.8,.2,1);
+    z-index:50;overflow-y:auto;
+  }
+  .reader.open{transform:translateY(0);}
+
+  .reader-top{
+    position:sticky;top:0;background:var(--pitch-dark);color:var(--paper);z-index:5;
+    padding:16px 24px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .reader-back{
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:var(--paper);
+    padding:8px 16px;border-radius:999px;font-family:'Oswald',sans-serif;font-size:12.5px;
+    letter-spacing:0.04em;cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .reader-back:hover{background:rgba(255,255,255,0.14);}
+
+  .reader-content{max-width:760px;margin:0 auto;padding:36px 24px 90px;}
+  .reader-cat{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;}
+  .reader h1{font-family:'Noto Serif Thai',serif;font-weight:700;font-size:clamp(26px,4vw,38px);line-height:1.28;margin:0 0 14px;}
+  .reader-byline{font-family:'Oswald',sans-serif;font-size:12.5px;color:var(--ink-dim);border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px;display:flex;gap:14px;flex-wrap:wrap;}
+
+  .reader-hero{
+    aspect-ratio:16/9;border-radius:4px;margin-bottom:8px;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--hc1,#274B3B),var(--hc2,#0B2E23));
+    display:flex;align-items:flex-end;
+  }
+  .reader-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,0.5) 100%);}
+  .reader-hero .cap{position:relative;z-index:1;color:rgba(255,255,255,0.9);font-family:'Oswald',sans-serif;font-size:13px;padding:14px 18px;letter-spacing:0.03em;}
+  .img-credit{font-size:11.5px;color:var(--ink-dim);margin:6px 0 26px;font-style:italic;}
+
+  .reader-content p{font-size:16px;line-height:1.9;margin:0 0 18px;color:#242019;}
+  .reader-content .lede{font-size:18px;font-weight:600;color:var(--ink);}
+  .pull{
+    font-family:'Noto Serif Thai',serif;font-style:italic;font-size:19px;line-height:1.7;
+    border-left:3px solid var(--amber);padding:4px 20px;margin:28px 0;color:#332B1E;
+  }
+  .section-tag{
+    display:inline-block;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;
+    letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);
+    border-bottom:2px solid var(--amber);padding-bottom:3px;margin:32px 0 14px;
+  }
+  .src-line{font-size:12.5px;color:var(--ink-dim);margin-top:36px;padding-top:16px;border-top:1px solid var(--line);}
+
+  .related{margin-top:52px;padding-top:26px;border-top:2px solid var(--ink);}
+  .related h3{font-family:'Noto Serif Thai',serif;font-size:20px;margin:0 0 18px;}
+  .related-list{display:flex;flex-direction:column;gap:2px;}
+  .related-item{
+    display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .related-item:hover .related-title{color:var(--amber);}
+  .related-thumb{
+    width:56px;height:56px;border-radius:4px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--hc1,#274B3B),var(--hc2,#0B2E23));
+  }
+  .related-title{font-size:14.5px;font-weight:600;line-height:1.4;transition:color 0.15s ease;}
+  .related-cat{font-size:11px;color:var(--ink-dim);font-family:'Oswald',sans-serif;letter-spacing:0.05em;text-transform:uppercase;}
+
+  @media (max-width:520px){
+    .wrap{padding:0 16px 60px;}
+    .reader-content{padding:28px 18px 70px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-inner">
+    <div class="brand"><span class="badge">ม</span> ม้านั่งสำรอง</div>
+    <div class="masthead-tag">เรื่องเล่าลูกหนัง จากคนที่ดูจนจบทุกนัด</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="homehead">
+    <div class="eyebrow">FEATURED STORIES</div>
+    <h1>เรื่องราวเบื้องหลังสนามหญ้า</h1>
+    <p>รวมเรื่องดราม่า การเปลี่ยนแปลง และซาก้าย้ายทีม ที่คนดูบอลคุยกันทั้งเดือน — คลิกอ่านเต็มๆ ได้เลย</p>
+  </div>
+
+  <div class="feed" id="feed"></div>
+</div>
+
+<div class="reader" id="reader">
+  <div class="reader-top">
+    <button class="reader-back" id="backBtn">← กลับหน้าแรก</button>
+    <div class="brand" style="font-size:16px;"><span class="badge" style="width:22px;height:22px;font-size:11px;">ม</span> ม้านั่งสำรอง</div>
+  </div>
+  <div class="reader-content" id="readerContent"></div>
+</div>
+
+<script>
+const stories = [
+{
+  id:'yamal-messi', cat:'มรดกส่งต่อ',
+  hc1:'#2E5A47', hc2:'#0B2E23',
+  title:'จากอุ้มมือ Messi วัย 5 เดือน สู่คู่ปรับในนัดชิงแชมป์โลก',
+  dek:'ภาพเก่าปี 2007 ที่ไม่มีใครคิดว่าจะกลายเป็นคำทำนาย',
+  heroCap:'Camp Nou, บาร์เซโลนา · 2007',
+  byline:['เรื่องพิเศษ','อ่าน 4 นาที'],
+  body:`
+    <p class="lede">ปี 2007 ที่ห้องแต่งตัวทีมเยือนของสนามคัมป์ นู ไม่มีใครในห้องนั้นคาดคิดว่าภาพถ่ายธรรมดาใบหนึ่งจะกลายเป็นหนึ่งในเรื่องเล่าที่ทรงพลังที่สุดของวงการฟุตบอลในอีก 19 ปีถัดมา</p>
+    <p>บาร์เซโลนาร่วมกับ UNICEF และหนังสือพิมพ์ Diario Sport จัดงานถ่ายแบบปฏิทินการกุศล ลิโอเนล เมสซี่ ดาวรุ่งวัยเพียง 20 ปีที่เพิ่งเริ่มฉายแสงในทีมชุดใหญ่ ถูกจับคู่กับครอบครัวหนึ่งที่สุ่มเลือกมาจากทางบ้าน ในมือของเขาคือทารกวัยเพียง 5 เดือน ที่เมสซี่ต้องช่วยแม่ของเด็กอาบน้ำให้ในกะละมังพลาสติกสีฟ้าใบเล็ก</p>
+    <div class="section-tag">ภาพที่ถูกลืม</div>
+    <p>ภาพนั้นถูกเก็บไว้เงียบๆ เกือบ 20 ปี ไม่เคยถูกเผยแพร่สู่สาธารณะ จนกระทั่งพ่อของเด็กทารกคนนั้นตัดสินใจขุดภาพขึ้นมาโพสต์อีกครั้ง พร้อมคำบรรยายสั้นๆ ว่า "จุดเริ่มต้นของตำนานสองคน" เด็กทารกในกะละมังวันนั้นคือ ลามีน ยามาล เด็กจากย่าน Rocafonda ที่ต่อมาจะเข้าอคาเดมี La Masia ตั้งแต่อายุ 6 ขวบ เดบิวต์ทีมชุดใหญ่บาร์เซโลนาในวัยเพียง 15 ปี และเดบิวต์ทีมชาติสเปนตอนอายุ 16</p>
+    <div class="pull">"ผมถ่ายรูปกับเขาตอนเป็นทารก วันนี้เรามาเจอกันในนัดชิงบอลโลก มันบ้ามาก" — ลิโอเนล เมสซี่</div>
+    <div class="section-tag">รอยเท้าที่เดินตามกัน</div>
+    <p>สิ่งที่ทำให้เรื่องนี้ขนลุกยิ่งกว่าคือความบังเอิญที่ตามมา ทั้งคู่ถนัดเท้าซ้ายเหมือนกัน เล่นตำแหน่งปีกขวาเหมือนกัน แจ้งเกิดด้วยเสื้อเบอร์ 19 และยิงประตูแรกในศึกเอล กลาซิโก้ ด้วยเบอร์เดียวกัน ก่อนที่ยามาลจะได้รับมอบเสื้อเบอร์ 10 อันเป็นตำนานต่อจากเมสซี่อย่างเป็นทางการก่อนซีซั่น 2025/26</p>
+    <div class="section-tag">นัดชิงที่ปิดวงจร</div>
+    <p>19 กรกฎาคม 2026 ที่ MetLife Stadium นิวเจอร์ซีย์ สเปนของยามาลพบกับอาร์เจนตินาของเมสซี่ในนัดชิงชนะเลิศฟุตบอลโลก เกมจบลงด้วยชัยชนะของสเปน 1-0 ในช่วงต่อเวลาพิเศษ จากประตูของเฟร์ราน ตอร์เรส นาทีที่ 106 หลังจบเกม ยามาลเดินเข้าไปกอดเมสซี่ที่กำลังร้องไห้กลางสนาม — ภาพที่สื่อทั่วโลกเรียกว่า "การส่งไม้ต่อจากตำนานวัย 39 สู่ปรากฏการณ์วัย 19"
+    </p>
+  `,
+  src:'อ้างอิง: การยืนยันภาพถ่ายปี 2007 จาก UNICEF, บทสัมภาษณ์เมสซี่และยามาลก่อน-หลังนัดชิงบอลโลก 2026, รายงานผลการแข่งขันนัดชิงชนะเลิศ 19 กรกฎาคม 2026'
+},
+{
+  id:'yamal-ego', cat:'การเปลี่ยนแปลง',
+  hc1:'#B9791F', hc2:'#0B2E23',
+  title:'จากอีโก้ สู่ฮีโร่: หนึ่งปีที่เปลี่ยนลามีน ยามาล',
+  dek:'ดราม่าวันเกิด บาดเจ็บเรื้อรัง อกหัก แล้วกลับมาเป็นผู้เล่นยอดเยี่ยมแห่งปี',
+  heroCap:'บาร์เซโลนา / มาดริด · ก.ค. 2025 – ก.ค. 2026',
+  byline:['เรื่องพิเศษ','อ่าน 6 นาที'],
+  body:`
+    <p class="lede">กรกฎาคม 2025 ลามีน ยามาล เพิ่งอายุครบ 18 ปี และกำลังยืนอยู่บนจุดสูงสุดของอาชีพ เขาเซ็นสัญญาฉบับใหม่กับบาร์เซโลนายาวถึงปี 2031 พร้อมได้รับมอบเสื้อเบอร์ 10 อันเป็นตำนานที่เมสซี่เคยสวม — ควรเป็นข่าวดีที่สุดในชีวิต แต่สัปดาห์เดียวกันนั้นเอง งานวันเกิดของเขาที่เมือง Olivella กลับกลายเป็นข่าวฉาวระดับประเทศ เมื่อมีรายงานว่าเขาจ้างนักแสดงภาวะแคระมาสร้างความบันเทิงในงาน จนสมาคม ADEE ต้องยื่นเรื่องร้องเรียนต่อกระทรวงสิทธิสังคมสเปน ข่าวดีที่สุดในอาชีพถูกกลบมิดด้วยดราม่าตั้งแต่วันแรกที่สวมเสื้อเบอร์ 10</p>
+
+    <div class="section-tag">มรสุมที่ถาโถมเข้ามา</div>
+    <p>เดือนกันยายน ยามาลเริ่มมีอาการปวดกระดูกหัวหน่าวเรื้อรัง (pubalgia) จากการไปเล่นให้ทีมชาติสเปน ทำให้ลงเล่นให้บาร์เซโลนาน้อยลงอย่างเห็นได้ชัด ก่อนเกม El Clásico ปลายเดือนตุลาคม เขายังไปพูดยั่วเรอัลมาดริดว่า "ขโมยแล้วยังบ่น" แต่พอถึงวันแข่งจริง 26 ตุลาคม เขาฝืนลงเล่นทั้งที่ยังเจ็บ ฟอร์มเงียบกริบตลอดเกม บาร์เซโลนาแพ้ไป 1-2</p>
+    <div class="pull">"พวกเราเล่นกันบนสนาม และวันนี้พวกเราคือคนที่ชนะ" — Aurélien Tchouaméni สวนกลับหลังเกม</div>
+
+    <div class="section-tag">จุดเปลี่ยน</div>
+    <p>ประมาณวันที่ 1 พฤศจิกายน ยามาลประกาศเลิกรากับ Nicki Nicole แร็ปเปอร์สาวชาวอาร์เจนตินาที่คบกันมาไม่กี่เดือน แล้วเพียงวันถัดมา เขาก็ยิงประตูได้ในเกมกับ Elche — เป็นประตูแรกในลีกในรอบหลายเดือน สื่อกีฬาถึงกับพาดหัวเชื่อมสองเหตุการณ์นี้เข้าด้วยกันตรงๆ ว่านี่คือการก้าวผ่านความเจ็บปวดด้วยประตูสำคัญ ไม่กี่วันถัดมา วันที่ 10 พฤศจิกายน มีเรื่องแทรกคนละสายเข้ามาอีก เมื่อสโมสรต้องเร่งส่งแพทย์ผู้เชี่ยวชาญจากเบลเยียมมารักษาอาการบาดเจ็บแบบเร่งด่วน จนสมาคมฟุตบอลสเปนไม่พอใจที่ไม่ได้รับแจ้งล่วงหน้า ต้องถอนตัวจากทีมชาติกะทันหัน</p>
+
+    <div class="section-tag">ฟอร์มพีคที่ไม่มีใครหยุดได้</div>
+    <p>แต่นับจากนั้น ทุกอย่างก็ค่อยๆ ดีขึ้นเรื่อยๆ 11 มกราคม 2026 เขาช่วยทีมคว้าแชมป์ Supercopa เอาชนะเรอัลมาดริด 3-2 แล้ววันที่ 28 กุมภาพันธ์ เขาก็ทำสิ่งที่ไม่เคยทำมาก่อนในอาชีพ — แฮตทริกแรกใส่ Villarreal ชนะ 4-1 ในวัยเพียง 18 ปี 230 วัน กลายเป็นนักเตะอายุน้อยที่สุดในศตวรรษที่ 21 ที่ทำแฮตทริกในลาลีกาได้ จบซีซั่น 2025/26 ด้วยผลงาน 16 ประตู 11 แอสซิสต์ และคว้ารางวัล LaLiga Player of the Season ไปครอง</p>
+
+    <div class="section-tag">ฮีโร่ของบอลโลก</div>
+    <p>ที่บอลโลก 2026 ยามาลลงสนามพร้อมผ้าคาดผมสกรีนคำว่า "Ego Yamal" — เปลี่ยนคำด่าที่เคยตามหลอกหลอนให้กลายเป็นสัญลักษณ์ของความมั่นใจ ในรอบรองชนะเลิศกับฝรั่งเศส เขาโดน Lucas Digne ทำฟาวล์ในกรอบเขตโทษ แม้จะมีดราม่าเรื่องแฮนด์บอลที่ฝรั่งเศสประท้วง แต่ VAR ยืนยันจุดโทษ และสเปนก็เดินหน้าเข้าสู่นัดชิงจนคว้าแชมป์โลกได้สำเร็จในที่สุด</p>
+  `,
+  src:'อ้างอิง: รายงานสโมสรบาร์เซโลนาและ RFEF, บทสัมภาษณ์หลังเกม El Clásico และ Elche, สถิติทางการ LaLiga ฤดูกาล 2025/26, รายงานฟุตบอลโลก 2026'
+},
+{
+  id:'isak', cat:'ซาก้าย้ายทีม',
+  hc1:'#8A1F1F', hc2:'#0B2E23',
+  title:'ย้อนซาก้าอิซัค: จากความหวังนิวคาสเซิล สู่นักเตะแพงสุดในประวัติศาสตร์บอลอังกฤษ',
+  dek:'ซ้อมคนเดียว โดนแฟนบอลด่า จนจบด้วยค่าตัว 130 ล้านปอนด์',
+  heroCap:'นิวคาสเซิล / ลิเวอร์พูล · ก.ค. – ก.ย. 2025',
+  byline:['ซาก้าย้ายทีม','อ่าน 5 นาที'],
+  body:`
+    <p class="lede">15 กรกฎาคม 2025 ลิเวอร์พูลประกาศความสนใจใน อเล็กซานเดอร์ อิซัค อย่างเป็นทางการ เพราะ Arne Slot ต้องการกองหน้าเบอร์ 9 คนใหม่ แต่นิวคาสเซิลยืนกรานหนักแน่นว่าจะไม่ขาย นี่คือจุดเริ่มต้นของซาก้าย้ายทีมที่ร้อนแรงที่สุดของซัมเมอร์นั้น</p>
+
+    <div class="section-tag">เมื่อความอดทนหมดลง</div>
+    <p>ไม่กี่วันถัดมา อิซัคไม่ลงเล่นนัดกระชับมิตรพรีซีซั่นกับ Celtic โดยโค้ช Eddie Howe เป็นคนตัดสินใจส่งเขากลับบ้านเอง สถานการณ์บานปลายหนักขึ้นเรื่อยๆ ตลอดเดือนสิงหาคม เขาปฏิเสธไม่ไปทัวร์พรีซีซั่นที่เอเชียโดยอ้างว่าเจ็บที่ต้นขา แต่กลับบินไปซ้อมกับ Real Sociedad สโมสรเก่าของตัวเองแทน พอกลับมาที่นิวคาสเซิล สโมสรสั่งให้เขาซ้อมหลังเพื่อนร่วมทีมกลับบ้านหมดแล้ว ห้ามซ้อมร่วมกับทีมชุดใหญ่</p>
+    <div class="pull">"หนู" และ "ของโสโครกที่โลภมาก" — ถ้อยคำที่แฟนบอลนิวคาสเซิลบางส่วนใช้เรียกอิซัคระหว่างซาก้านี้</div>
+    <p>มีคลิปไวรัลที่อิซัคเดินเข้าสนามซ้อมคนเดียว ใส่หมวกฮู้ดปิดหน้า ไม่มีสตาฟฟ์เดินด้วยแม้แต่คนเดียว กลายเป็นภาพสัญลักษณ์ของความสัมพันธ์ที่ร้าวฉานระหว่างนักเตะกับสโมสรที่เขาเคยรัก</p>
+
+    <div class="section-tag">จุดแตกหัก</div>
+    <p>21 สิงหาคม อิซัคออกแถลงการณ์ผ่านอินสตาแกรมว่า "เมื่อสัญญาที่เคยให้ไว้ถูกทำลาย และความไว้ใจหายไป ความสัมพันธ์แบบนี้มันไปต่อไม่ได้แล้ว" พร้อมกล่าวหาว่าสโมสรผิดสัญญาที่เคยตกลงกันไว้ลับหลัง นิวคาสเซิลออกมาปฏิเสธทันที ก่อนหน้านั้นเขายังไม่ไปงานประกาศรางวัล PFA Team of the Season ทั้งที่ติดทีมยอดเยี่ยมของฤดูกาล</p>
+
+    <div class="section-tag">บทสรุปในวันเส้นตาย</div>
+    <p>สุดท้ายในวันปิดตลาดซื้อขาย ลิเวอร์พูลทุ่มเงิน 125 ล้านปอนด์ บวกค่า solidarity payment อีก 5 ล้าน รวมเป็น 130 ล้านปอนด์ สร้างสถิติค่าตัวแพงที่สุดในประวัติศาสตร์วงการฟุตบอลอังกฤษ เซ็นสัญญา 6 ปี แต่เพราะไม่ได้ซ้อมกับทีมมาทั้งซัมเมอร์ อิซัคกลับโดนดร็อปจากตัวจริงในเกมแรกกับ Burnley เดบิวต์จริงเกิดขึ้นในแชมเปียนส์ลีกกับ Atlético Madrid ที่เขาลงเล่น 58 นาที ก่อน Slot จะยอมรับว่า "แปลกใจในแง่ดี" กับความฟิตที่ยังเหลืออยู่ ทั้งที่ไม่มีพรีซีซั่นเลยสักนัด</p>
+  `,
+  src:'อ้างอิง: แถลงการณ์อย่างเป็นทางการของนิวคาสเซิลและอิซัค, รายงานการซื้อขายวันเส้นตายฤดูกาล 2025/26, บทสัมภาษณ์ Arne Slot หลังเกมแชมเปียนส์ลีก'
+},
+{
+  id:'martial', cat:'ดาวรุ่งดับวูบ',
+  hc1:'#7A1F1F', hc2:'#0B2E23',
+  title:'Anthony Martial: จากวัยรุ่นแพงสุดในโลก สู่ฟรีเอเย่นต์วัย 30',
+  dek:'เดบิวต์สับตาข่ายลิเวอร์พูล ไล่มาจนถึงยกเลิกสัญญาที่เม็กซิโก',
+  heroCap:'โอลด์แทรฟฟอร์ด · 2015 – 2024',
+  byline:['ดาวรุ่งดับวูบ','อ่าน 4 นาที'],
+  body:`
+    <p class="lede">กันยายน 2015 แมนเชสเตอร์ ยูไนเต็ด ทุ่มเงินสูงสุด 58 ล้านปอนด์ (เริ่มต้น 36 ล้าน) ดึงตัวแอนโธนี มาร์กซิยาล วัยเพียง 19 ปี จาก AS Monaco ทำให้เขากลายเป็นวัยรุ่นค่าตัวแพงที่สุดในประวัติศาสตร์พรีเมียร์ลีกในตอนนั้น เดบิวต์ของเขาเป็นตำนานทันที เมื่อเขาเลี้ยงหลบ Martin Škrtel แล้วสับตาข่ายลิเวอร์พูลด้วยลูกยิงสุดสวย</p>
+
+    <div class="section-tag">ช่วงพีคที่มาถึงช้าไปหน่อย</div>
+    <p>ซีซั่นที่ดีที่สุดของเขาคือ 2019-20 ภายใต้ Ole Gunnar Solskjaer ที่เขายิงไป 23 ประตูจาก 48 นัด กลายเป็นตัวเก็บประตูอันดับ 1 ของทีม และคว้ารางวัล Players' Player of the Year ไปครอง</p>
+
+    <div class="section-tag">ความล้มเหลวที่ค่อยเป็นค่อยไป</div>
+    <p>ไม่มีจุดพลิกผันเดียวที่ทำให้ทุกอย่างพัง แต่เป็นความล้มเหลวสะสมทีละนิด สไตล์ของ José Mourinho ที่ต้องการปีกที่วิ่งกลับมาช่วยเกมรับไม่ใช่จุดแข็งของมาร์กซิยาลเลย และปัญหาที่หนักที่สุดคืออาการบาดเจ็บสะสมที่ทำให้เขาไม่สามารถเล่นครบ 90 นาทีได้ต่อเนื่องนานถึง 3 ปี</p>
+
+    <div class="pull">รวมระยะเวลาที่แมนยู เขาลงเล่น 317 นัด ยิงได้ 90 ประตู ช่วยทีมคว้าแชมป์ FA Cup 2 สมัย Carabao Cup 2 สมัย และยูโรปาลีก 1 สมัย</div>
+
+    <div class="section-tag">ชีวิตหลังแมนยู</div>
+    <p>ออกจากทีมในปี 2024 หลังหมดสัญญาแบบไม่มีใครเสียดาย ไปเล่นให้ AEK Athens ในกรีซที่เริ่มต้นดีก่อนตกกระป๋องไม่ถูกเลือกลงเล่นในเกมสำคัญ แล้วย้ายไป Monterrey ในเม็กซิโก แต่ลงเล่นได้เพียง 20 นัดก่อนทั้งสองฝ่ายตกลงยกเลิกสัญญากัน ปัจจุบันเขาเป็นฟรีเอเย่นต์ไม่มีสังกัด — เส้นทาง 9 ปีที่ควรจะเป็นตำนานคนใหม่ของโอลด์แทรฟฟอร์ด จบลงแบบที่ไม่มีใครคาดคิดในวันที่เขาเดบิวต์</p>
+  `,
+  src:'อ้างอิง: สถิติทางการสโมสรแมนเชสเตอร์ ยูไนเต็ด, รายงานการย้ายทีมปี 2024, สถิติ AEK Athens และ Monterrey'
+},
+{
+  id:'raphinha', cat:'บัลลงดอร์',
+  hc1:'#1F5A8A', hc2:'#0B2E23',
+  title:'ราฟินย่า: ทริปเปิ้ลแชมป์ แต่บัลลงดอร์ให้แค่อันดับ 5',
+  dek:'เมื่อ Neymar เองยังทนไม่ไหวกับผลโหวต',
+  heroCap:'บาร์เซโลนา · ฤดูกาล 2024/25',
+  byline:['บัลลงดอร์ 2025','อ่าน 4 นาที'],
+  body:`
+    <p class="lede">สองซีซั่นแรกของราฟินย่าที่บาร์เซโลนาเต็มไปด้วยความผันผวน มีเสียงเรียกร้องจากแฟนบอลให้เปลี่ยนตัวปีกซ้ายคนใหม่แทนเขา เจ้าตัวเคยเปิดใจว่าเกือบจะออกจากทีมไปแล้วตั้งแต่ต้นซีซั่น ก่อนที่การมาของ Hansi Flick จะเปลี่ยนทุกอย่าง</p>
+
+    <div class="section-tag">ซีซั่นที่ดีที่สุดในชีวิตค้าแข้ง</div>
+    <p>2024/25 คือซีซั่นที่ราฟินย่าระเบิดฟอร์มเต็มที่ ยิงไป 34 ประตู แอสซิสต์ 22 ครั้งจาก 57 นัด ช่วยบาร์เซโลนาคว้าทริปเปิ้ลแชมป์ในประเทศเป็นครั้งแรกในประวัติศาสตร์สโมสร ในแชมเปียนส์ลีกเขาทำสถิติเทียบเท่ากับที่ Cristiano Ronaldo เคยทำไว้ในแคมเปญเดียว และเป็นดาวซัลโวร่วมของทัวร์นาเมนต์ด้วย 13 ประตู</p>
+
+    <div class="section-tag">ค่ำคืนที่ทั้งวงการช็อก</div>
+    <p>เมื่อประกาศผลบัลลงดอร์ 2025 ราฟินย่าจบลงที่อันดับ 5 ตามหลัง Dembélé, Yamal, Vitinha และ Salah ทั้งที่หลายฝ่ายมองว่าเขาสมควรอยู่ในกลุ่มท็อป 3 อย่างน้อยที่สุด</p>
+    <div class="pull">"Raphinha at 5 is too much of a joke" — Neymar เพื่อนร่วมชาติ โพสต์ตอบโต้ผ่านอินสตาแกรม</div>
+    <p>Hansi Flick โค้ชของเขาเองก็ออกมาพูดในงานแถลงข่าวแบบไม่ไว้หน้าใครว่า FIFA The Best XI ที่ไม่มีชื่อราฟินย่าคือ "เรื่องตลก" ส่วนตัวราฟินย่าเองก็ยอมรับตรงๆ ว่า "ผมคาดหวังอย่างน้อยต้องติดท็อป 3" และวิจารณ์ระบบการโหวตว่าต้องเอาใจคนโหวตด้วยความเป็นมิตรถึงจะมีสิทธิ์ชนะ</p>
+  `,
+  src:'อ้างอิง: ผลการประกาศรางวัลบัลลงดอร์ 2025, สถิติทางการลาลีกาและแชมเปียนส์ลีกฤดูกาล 2024/25, โพสต์โซเชียลมีเดียของ Neymar'
+},
+{
+  id:'dimaria', cat:'ดาวรุ่งดับวูบ',
+  hc1:'#7A1F1F', hc2:'#0B2E23',
+  title:'Ángel Di María: Galactico ที่เกลียดแมนเชสเตอร์เข้าไส้',
+  dek:'ค่าตัวสถิติปี 2014 จบลงด้วยซีซั่นเดียวและบ้านที่โดนปล้น',
+  heroCap:'โอลด์แทรฟฟอร์ด · 2014-15',
+  byline:['ดาวรุ่งดับวูบ','อ่าน 3 นาที'],
+  body:`
+    <p class="lede">2014 แมนเชสเตอร์ ยูไนเต็ด ทุ่มเงิน 59.7 ล้านปอนด์ ดึงตัว Ángel Di María จากเรอัลมาดริด หลังเพิ่งช่วยทีมคว้าแชมป์แชมเปียนส์ลีกสมัยที่ 10 มาหมาดๆ เขาได้สวมเสื้อเบอร์ 7 ต่อจากตำนานอย่าง Cristiano Ronaldo, Eric Cantona และ David Beckham ถูกยกให้เป็น Galactico ที่จะพาแมนยูกลับสู่ระดับท็อปยุโรปอีกครั้ง เดบิวต์ของเขาสวยงามด้วยลูกฟรีคิกใส่ QPR ในเกมที่ชนะ 4-0</p>
+
+    <div class="section-tag">ทุกอย่างเริ่มพังพร้อมกัน</div>
+    <p>ปัญหาหลักคือความสัมพันธ์ที่ร้าวฉานกับโค้ช Louis van Gaal ที่ชอบสลับตำแหน่งให้เขาเล่นได้หลายบทบาท ทำให้ Di María รู้สึกไม่มั่นคง เจ้าตัวเคยเล่าว่าทุกอย่างเริ่มต้นดีมาก แต่พอเริ่มมีปัญหากับ Van Gaal ทุกอย่างก็พังทลาย</p>
+    <p>สิ่งที่ซ้ำเติมความสัมพันธ์ที่แย่อยู่แล้วคือเหตุการณ์บ้านของเขาถูกโจรปล้นแบบน่าสยดสยอง ทำให้เขาตัดสินใจย้ายทีมแบบเด็ดขาดไม่หันหลังกลับ</p>
+    <div class="pull">"ไม่ชอบที่นี่เลยตั้งแต่แรก คนที่นี่แปลกๆ เดินไปเดินมาไม่รู้ว่าจะถูกฆ่าเมื่อไหร่" — Jorgelina Cardoso ภรรยาของ Di María</div>
+    <p>ยิงได้เพียง 4 ประตู แอสซิสต์ 12 ครั้งจาก 32 นัดในทุกรายการ ถูกโหวตให้เป็นนักเตะที่ซื้อมาแล้วแย่ที่สุดของซีซั่นนั้น สุดท้ายอยู่แค่ซีซั่นเดียวก่อนถูกขายให้ PSG แบบขาดทุนหนัก</p>
+  `,
+  src:'อ้างอิง: สถิติทางการสโมสรแมนเชสเตอร์ ยูไนเต็ด ฤดูกาล 2014/15, บทสัมภาษณ์ครอบครัว Di María'
+},
+{
+  id:'pogba', cat:'ดาวรุ่งดับวูบ',
+  hc1:'#7A1F1F', hc2:'#0B2E23',
+  title:'Paul Pogba: พรสวรรค์ที่ถูกดราม่ากลืนกิน',
+  dek:'105 ล้านปอนด์ สงครามกับ Mourinho คดีน้องชาย และการแบนสารต้องห้าม',
+  heroCap:'อคาเดมีแมนยู → ยูเวนตุส → แมนยู · 2009-2022',
+  byline:['ดาวรุ่งดับวูบ','อ่าน 5 นาที'],
+  body:`
+    <p class="lede">Paul Pogba เข้าอคาเดมีแมนเชสเตอร์ ยูไนเต็ดตั้งแต่อายุ 16 ปี ก่อนย้ายไปยูเวนตุสแบบไม่มีค่าตัวในปี 2012 คว้าแชมป์กัลโช่เซเรียอา 4 สมัยติดต่อกัน จนกลายเป็นมิดฟิลด์ระดับโลกที่ทุกทีมใหญ่อยากได้ตัว 2016 เขากลับมาแมนยูด้วยค่าตัว 89 ล้านปอนด์ สร้างสถิติโลกในตอนนั้น</p>
+
+    <div class="section-tag">สงครามเปิดกับ Mourinho</div>
+    <p>ความสัมพันธ์กับโค้ช José Mourinho บานปลายเป็นสงครามเปิด ไม่ได้ลงเป็นตัวจริงในเกมสำคัญ มีข่าวเอเยนต์เสนอขายให้แมนซิตี้ พี่ชายของเขาเปิดเผยว่า Pogba เกือบย้ายออกตอนอยู่ใต้ Mourinho เพราะไม่มีความสุขเลย ช่วงที่ดีขึ้นสั้นๆ มาในยุค Solskjaer ที่เขายิงไป 8 ประตูใน 9 นัดแรก ก่อนฟอร์มจะร่วงลงอีกครั้ง</p>
+
+    <div class="section-tag">ดราม่านอกสนามที่หนักที่สุด</div>
+    <p>ก่อนโดนตรวจพบสารต้องห้าม พี่ชายแท้ๆ ของเขาออกมากล่าวหาผ่านคลิปวิดีโอว่า Pogba จ้างหมอผีทำคุณไสยใส่ Kylian Mbappé เพื่อนร่วมทีมชาติ สุดท้ายพี่ชายโดนจับข้อหาแบล็กเมล์ กลายเป็นคดีอาญาใหญ่โตในฝรั่งเศส ตามมาด้วยการโดนแบนจากวงการฟุตบอลนาน 4 ปี เพราะตรวจพบสารต้องห้ามหลังย้ายกลับยูเวนตุส ก่อนอุทธรณ์ลดโทษเหลือ 18 เดือน</p>
+
+    <div class="pull">ปัจจุบันเป็นฟรีเอเย่นต์ อายุ 32 ปี ยังฝึกซ้อมหนักโดยหวังจะได้กลับไปเล่นบอลโลก 2026 ให้ทัน</div>
+    <p>หลังพ้นโทษแบน เซ็นสัญญากับ AS Monaco แต่บาดเจ็บสะสมหนักมาก ลงเล่นได้เพียง 115 นาทีทั้งซีซั่น เส้นทางของนักเตะที่เคยถูกมองว่าเก่งที่สุดคนหนึ่งของโลก จบลงด้วยคำถามว่าจะได้กลับมายืนในสนามอีกครั้งหรือไม่</p>
+  `,
+  src:'อ้างอิง: รายงานการสอบสวนคดีแบล็กเมล์ในฝรั่งเศส, ประกาศโทษแบนจากหน่วยงานต่อต้านสารต้องห้าม, สถิติทางการ AS Monaco'
+},
+{
+  id:'alvarez', cat:'ซาก้าย้ายทีม',
+  hc1:'#8A1F1F', hc2:'#0B2E23',
+  title:'Julián Álvarez อยากไปตามฝัน แต่สโมสรกีดกัน',
+  dek:'ขอย้ายจากแอตเลติโก แต่ติดกำแพงค่าฉีกสัญญา 500 ล้านยูโร',
+  heroCap:'แอตเลติโก มาดริด · ซัมเมอร์ 2026',
+  byline:['ซาก้าย้ายทีม','อ่าน 3 นาที'],
+  body:`
+    <p class="lede">หลังจบบอลโลก 2026 ปลายเดือนมิถุนายน Julián Álvarez ให้สัมภาษณ์อย่างตรงไปตรงมาว่าอยากออกจาก Atlético Madrid — คำพูดง่ายๆ ประโยคเดียวที่จุดชนวนซาก้าย้ายทีมที่ร้อนแรงที่สุดของซัมเมอร์นี้</p>
+
+    <div class="section-tag">กำแพงที่แทบเป็นไปไม่ได้</div>
+    <p>เรอัลมาดริดยื่นข้อเสนอไปแล้วถึง 2 ครั้ง แต่โดนปฏิเสธทั้งคู่ ปัญหาคือสัญญาของ Álvarez ยังเหลือถึงปี 2030 พร้อมค่าฉีกสัญญาที่สูงถึง 500 ล้านยูโร ซึ่งแทบเป็นไปไม่ได้ในทางปฏิบัติสำหรับสโมสรไหนในโลก</p>
+    <p>ที่เจ็บกว่านั้นคือปฏิกิริยาของแอตเลติโกเอง สโมสรโพสต์เสียดสีผ่านโซเชียลมีเดียแบบเจ็บแสบ พร้อมภาพตัดต่อนักเตะบาร์เซโลนาใส่เสื้อแอตเลติโกล้อเลียน สื่อถึงนัยว่าพวกเขายังไม่ยอมแพ้ให้กับข้อเสนอใดๆ ง่ายๆ</p>
+
+    <div class="section-tag">บทเรียนจากซาก้าก่อนหน้า</div>
+    <p>เรื่องนี้ชวนให้นึกถึงซาก้าของ Alexander Isak เมื่อซัมเมอร์ก่อน ที่นักเตะใช้วิธีประท้วงจนสโมสรยอมขายในที่สุด คำถามคือ Álvarez จะเลือกใช้เส้นทางเดียวกันหรือไม่ ในเมื่อกำแพงค่าฉีกสัญญาของเขาสูงกว่าของ Isak มาก</p>
+  `,
+  src:'อ้างอิง: บทสัมภาษณ์ Julián Álvarez หลังบอลโลก 2026, รายงานข้อเสนอจากเรอัลมาดริด, โพสต์โซเชียลมีเดียอย่างเป็นทางการของแอตเลติโก มาดริด'
+},
+{
+  id:'bruno', cat:'บัลลงดอร์',
+  hc1:'#1F5A8A', hc2:'#0B2E23',
+  title:'บรูโน่ผู้ถูกเลือกให้ผิดหวัง',
+  dek:'สถิติแอสซิสต์สูงสุดในประวัติศาสตร์พรีเมียร์ลีก แต่ไร้สิทธิ์ลุ้นบัลลงดอร์',
+  heroCap:'โอลด์แทรฟฟอร์ด · ฤดูกาล 2025/26',
+  byline:['บัลลงดอร์','อ่าน 3 นาที'],
+  body:`
+    <p class="lede">ในซีซั่นที่แมนเชสเตอร์ ยูไนเต็ดไม่มีถ้วยรางวัลติดมือและไม่ได้เล่นฟุตบอลยุโรปเลย Bruno Fernandes กลับทำสถิติที่แทบไม่น่าเชื่อ — สร้างโอกาสทำประตูรวม 137 ครั้งตลอดซีซั่น มากกว่าอันดับ 2 กว่า 50 ครั้ง กลายเป็นสถิติแอสซิสต์สูงสุดในประวัติศาสตร์พรีเมียร์ลีกซีซั่นเดียว</p>
+
+    <div class="section-tag">ผลงานเทพ ที่ไม่มีเวทีให้แสดง</div>
+    <p>แต่ปัญหาคือบัลลงดอร์แทบไม่เคยเลือกนักเตะที่ไม่ได้แสดงฝีเท้าบนเวทีแชมเปียนส์ลีกหรือยูโรปาลีก เพราะไม่มีจุดเทียบกับซูเปอร์สตาร์คนอื่นในระดับเดียวกัน และรางวัลนี้ให้น้ำหนักกับถ้วยใหญ่มาก ซึ่งแมนยูซีซั่นที่ผ่านมาไม่มีเลยสักถ้วย</p>
+    <p>ในบอลโลก 2026 โปรตุเกสของบรูโน่ตกรอบไปตั้งแต่รอบ 16 ทีมสุดท้าย ยิ่งซ้ำเติมโอกาสของเขาให้ริบหรี่ลงไปอีก</p>
+
+    <div class="section-tag">ติดชื่อ แต่ไม่ใช่ตัวเต็ง</div>
+    <p>บรูโน่ยังคงมีชื่อในรายชื่อผู้มีสิทธิ์ถูกพิจารณา แต่ไม่ใช่ตัวเต็งอันดับต้นๆ ที่จะไปคว้ารางวัลจริง — เก่งที่สุดในลีกจริง แต่เพราะทีมไม่ได้ไปเล่นยุโรปเลย จึงไม่มีสิทธิ์ลุ้นจริงจังต่อให้ผลงานส่วนตัวจะทุบสถิติขนาดไหนก็ตาม</p>
+  `,
+  src:'อ้างอิง: สถิติทางการพรีเมียร์ลีกฤดูกาล 2025/26, ผลการแข่งขันบอลโลก 2026 รอบ 16 ทีมสุดท้าย'
+},
+{
+  id:'academy4', cat:'ดาวรุ่งดับวูบ',
+  hc1:'#7A1F1F', hc2:'#0B2E23',
+  title:'4 ดาวรุ่งแมนยูที่พร้อมไประดับโลก แต่ต้องดับกลางทาง',
+  dek:'Martial, Lingard, Rashford, Greenwood — รุ่นทองที่ไม่มีวันทอง',
+  heroCap:'อคาเดมีแมนเชสเตอร์ ยูไนเต็ด',
+  byline:['ซีรีส์ 4 ตอน','อ่าน 4 นาที'],
+  body:`
+    <p class="lede">แมนเชสเตอร์ ยูไนเต็ดยุคหลังเฟอร์กี้เต็มไปด้วยเคสของดาวรุ่งบ้านเกิดหรืออคาเดมีที่เคยถูกมองว่าจะเป็นระดับโลก แต่กลับดับวูบกลางทางทั้งรุ่น สี่ชื่อที่มักถูกพูดถึงคู่กันเสมอคือ Anthony Martial, Jesse Lingard, Marcus Rashford และ Mason Greenwood</p>
+
+    <div class="section-tag">คนละเหตุผล ปลายทางเดียวกัน</div>
+    <p>Martial เจอปัญหาบาดเจ็บสะสมที่ทำให้ไม่เคยเล่นครบ 90 นาทีต่อเนื่องได้นาน Lingard มีช่วงพีคสั้นๆ ปี 2020-21 ก่อนและหลังจากนั้นแทบไม่ได้ใช้งาน Rashford ดาวรุ่งบ้านเกิดที่เคยถูกมองว่าจะเป็นดาวยิงระดับโลก แต่ฟอร์มตกฮวบต่อเนื่องหลายซีซั่นจนต้องย้ายออก ส่วน Greenwood มีพรสวรรค์สูงสุดในรุ่นแต่ต้องจบเส้นทางที่แมนยูเพราะปัญหานอกสนาม</p>
+
+    <div class="pull">ทั้ง 4 คนต่างเคยถูกคาดหวังในระดับใกล้เคียงกัน แต่ไม่มีใครไปถึงจุดสูงสุดที่ควรจะเป็น</div>
+    <p>เรื่องราวของทั้งสี่คนสะท้อนคำถามที่ใหญ่กว่านั้น — ทำไมพรสวรรค์ที่ผ่านอคาเดมีระดับโลกของแมนยู ถึงมักไม่ไปถึงฝันที่ทุกคนเคยวาดไว้ให้ เป็นปัญหาที่ตัวนักเตะเอง หรือสภาพแวดล้อมของสโมสรกันแน่</p>
+  `,
+  src:'อ้างอิง: สถิติทางการสโมสรแมนเชสเตอร์ ยูไนเต็ด ของนักเตะทั้ง 4 คนตลอดช่วงที่อยู่กับทีม'
+}
+];
+
+const feed = document.getElementById('feed');
+const reader = document.getElementById('reader');
+const readerContent = document.getElementById('readerContent');
+const backBtn = document.getElementById('backBtn');
+
+function render(){
+  feed.innerHTML = '';
+  stories.forEach((s,i)=>{
+    const card = document.createElement('div');
+    card.className='story';
+    card.tabIndex=0;
+    card.setAttribute('role','button');
+    card.setAttribute('aria-label','อ่าน: '+s.title);
+    card.style.setProperty('--hc1', s.hc1);
+    card.style.setProperty('--hc2', s.hc2);
+    card.innerHTML = `
+      <div class="story-hero">
+        <span class="hero-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="hero-mono">${s.heroCap}</span>
+      </div>
+      <div class="story-body">
+        <span class="story-cat">${s.cat}</span>
+        <h2>${s.title}</h2>
+        <p class="dek">${s.dek}</p>
+        <div class="story-meta"><span>${s.byline[0]}</span><span>${s.byline[1]}</span></div>
+      </div>
+    `;
+    card.addEventListener('click', ()=>openStory(s));
+    card.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();openStory(s);} });
+    feed.appendChild(card);
+  });
+}
+
+function openStory(s){
+  readerContent.innerHTML = `
+    <div class="reader-cat">${s.cat}</div>
+    <h1>${s.title}</h1>
+    <div class="reader-byline"><span>ม้านั่งสำรอง</span><span>${s.byline[1]}</span></div>
+    <div class="reader-hero" style="--hc1:${s.hc1};--hc2:${s.hc2};"><span class="cap">${s.heroCap}</span></div>
+    <div class="img-credit">ภาพประกอบ: จัดวางตามธีมเรื่อง — แทนที่ด้วยภาพจริงได้ก่อนเผยแพร่</div>
+    ${s.body}
+    <div class="src-line">${s.src}</div>
+    <div class="related">
+      <h3>เรื่องที่เกี่ยวข้อง</h3>
+      <div class="related-list" id="relatedList"></div>
+    </div>
+  `;
+  const relList = document.getElementById('relatedList');
+  stories.filter(x=>x.id!==s.id).slice(0,4).forEach(r=>{
+    const item = document.createElement('div');
+    item.className='related-item';
+    item.tabIndex=0;
+    item.innerHTML = `
+      <div class="related-thumb" style="--hc1:${r.hc1};--hc2:${r.hc2};"></div>
+      <div>
+        <div class="related-cat">${r.cat}</div>
+        <div class="related-title">${r.title}</div>
+      </div>
+    `;
+    item.addEventListener('click', ()=>openStory(r));
+    relList.appendChild(item);
+  });
+  reader.classList.add('open');
+  window.scrollTo(0,0);
+  reader.scrollTop = 0;
+}
+
+backBtn.addEventListener('click', ()=>{ reader.classList.remove('open'); });
+
+render();
+</script>
+</body>
+</html>
